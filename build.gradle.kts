@@ -10,9 +10,9 @@ version = "1.0.0"
 
 repositories { mavenCentral() }
 
-kotlin { jvmToolchain(23) }
+kotlin { jvmToolchain(21) }
 
-java { toolchain.languageVersion.set(JavaLanguageVersion.of(23)) }
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(21)) }
 
 repositories {
     mavenCentral()
