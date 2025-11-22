@@ -1,0 +1,2 @@
+com.cf.ksp.processors.annotations.processors.PartialProcessor
+com.cf.ksp.processors.config.ConfigProcessor
