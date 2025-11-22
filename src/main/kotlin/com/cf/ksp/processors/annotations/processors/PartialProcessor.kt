@@ -12,6 +12,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.validate
 
 class PartialProcessor : SymbolProcessorProvider {
   override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
@@ -24,11 +25,21 @@ class PartialProcessor : SymbolProcessorProvider {
     override fun process(resolver: Resolver): List<KSAnnotated> {
       logger.info("🔧 Starting PartialProcessor")
 
-      resolver
-        .getSymbolsWithAnnotation(GeneratePartial::class.qualifiedName!!)
-        .filterIsInstance<KSClassDeclaration>()
-        .forEach { generatePartialClass(it) }
-      return emptyList()
+      val symbols =
+        resolver
+          .getSymbolsWithAnnotation(GeneratePartial::class.qualifiedName!!)
+          .filterIsInstance<KSClassDeclaration>()
+      val deferredSymbols = mutableListOf<KSAnnotated>()
+      symbols.forEach { classDeclaration ->
+        if (classDeclaration.validate()) {
+          logger.info("validates - processing")
+          generatePartialClass(classDeclaration)
+        } else {
+          logger.info("doesn't validate - deferring")
+          deferredSymbols.add(classDeclaration)
+        }
+      }
+      return deferredSymbols
     }
 
     private fun generatePartialClass(classDeclaration: KSClassDeclaration) {
@@ -93,7 +104,9 @@ class PartialProcessor : SymbolProcessorProvider {
                     """
             .trimIndent()
         )
-        writer.write("\n@Generated(\"com.cf.ksp.processors.annotations.processors.PartialProcessor\")\n")
+        writer.write(
+          "\n@Generated(\"com.cf.ksp.processors.annotations.processors.PartialProcessor\")\n"
+        )
         writer.write(classAnnotations.joinToString("\n"))
         writer.write("\ndata class $partialClassName(\n")
         writer.write(propertyStrings.joinToString(",\n"))

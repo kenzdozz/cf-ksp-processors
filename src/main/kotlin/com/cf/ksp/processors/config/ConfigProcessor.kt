@@ -9,9 +9,9 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import java.io.File
-import org.yaml.snakeyaml.Yaml
 import kotlin.collections.get
 import kotlin.collections.iterator
+import org.yaml.snakeyaml.Yaml
 
 class ConfigProcessor : SymbolProcessorProvider {
   override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
